@@ -688,9 +688,15 @@ body {
 
 .footer-content {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
+    grid-template-columns: 2fr 3fr;
     gap: 3rem;
     margin-bottom: 3rem;
+}
+
+.footer-links {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
 }
 
 .footer-brand {
@@ -771,7 +777,13 @@ body {
     }
     
     .footer-content {
+        grid-template-columns: 1fr 2fr;
+        gap: 2rem;
+    }
+    
+    .footer-links {
         grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
     }
 }
 
@@ -816,6 +828,12 @@ body {
     
     .footer-content {
         grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .footer-links {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
 }
 
