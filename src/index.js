@@ -4,7 +4,7 @@
  * Convert, extract, and manage Microsoft Outlook OST files
  * 
  * @author SkyLostTR (@Keeftraum)
- * @version 2.0.0
+ * @version require('../package.json').version;
  * @license SEE LICENSE IN LICENSE
  * @repository https://github.com/SkyLostTR/OST2GO
  */
@@ -18,6 +18,7 @@ const OstToPstConverter = require('./converter/OstToPstConverter');
 const RealOstToPstConverter = require('./converter/RealOstToPstConverter');
 const PstValidator = require('./validator/PstValidator');
 const { PSTFile } = require('pst-extractor');
+const packageInfo = require('../package.json');
 
 const program = new Command();
 
@@ -129,10 +130,12 @@ function showCredits() {
   console.log(chalk.gray('└────────────────────────────────────────────────────────────┘'));
 }
 
+// Get package.json data
+
 program
   .name('ost2go')
-  .description('OST2GO by SkyLostTR (@Keeftraum) - Complete OST/PST management toolkit')
-  .version('2.0.0');
+  .description(`OST2GO by SkyLostTR (@Keeftraum) - ${packageInfo.description}`)
+  .version(packageInfo.version);
 
 program
   .command('convert')
