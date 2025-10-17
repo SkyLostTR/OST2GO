@@ -14,13 +14,9 @@
 [![GitHub Issues](https://img.shields.io/github/issues/SkyLostTR/OST2GO.svg)](https://github.com/SkyLostTR/OST2GO/issues)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)](https://github.com/SkyLostTR/OST2GO)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/SkyLostTR/OST2GO/publish.yml?branch=main)](https://github.com/SkyLostTR/OST2GO/actions)
-
 [![GitHub Forks](https://img.shields.io/github/forks/SkyLostTR/OST2GO.svg)](https://github.com/SkyLostTR/OST2GO/network/members)
-
 [![Contributors](https://img.shields.io/github/contributors/SkyLostTR/OST2GO.svg)](https://github.com/SkyLostTR/OST2GO/graphs/contributors)
-
 [![Last Commit](https://img.shields.io/github/last-commit/SkyLostTR/OST2GO.svg)](https://github.com/SkyLostTR/OST2GO/commits/main)
-
 [![Code Size](https://img.shields.io/github/languages/code-size/SkyLostTR/OST2GO.svg)](https://github.com/SkyLostTR/OST2GO)
 
 **Created by [SkyLostTR](https://github.com/SkyLostTR) (@Keeftraum)**
@@ -433,4 +429,5 @@ This project is licensed under a proprietary license - see the [LICENSE](./LICEN
 
 **OST2GO v2.0.0** - Complete OST/PST Management Toolkit  
 *Built with ❤️ by SkyLostTR (@Keeftraum)*
+
 
