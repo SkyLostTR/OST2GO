@@ -123,18 +123,68 @@ function createProgressBar(format, options) {
  * Display credits header for commands
  */
 function showCredits() {
-  console.log(chalk.gray('┌────────────────────────────────────────────────────────────┐'));
-  console.log(chalk.gray('│ ') + chalk.cyan('Author:   ') + chalk.white('SkyLostTR (@Keeftraum)') + chalk.gray('                       │'));
-  console.log(chalk.gray('│ ') + chalk.cyan('GitHub:   ') + chalk.white('https://github.com/SkyLostTR/OST2GO') + chalk.gray('        │'));
-  console.log(chalk.gray('│ ') + chalk.cyan('Project:  ') + chalk.white('OST2GO - OST/PST Management Toolkit') + chalk.gray('        │'));
-  console.log(chalk.gray('└────────────────────────────────────────────────────────────┘'));
+  console.log(chalk.cyan('┌────────────────────────────────────────────────────────────┐'));
+  console.log(chalk.cyan('│ ') + chalk.bold.white('👤 Author:   ') + chalk.green('SkyLostTR') + chalk.gray(' (@Keeftraum)') + chalk.cyan('                  │'));
+  console.log(chalk.cyan('│ ') + chalk.bold.white('🌐 Website:  ') + chalk.blue.underline('https://ost2go.kief.fi') + chalk.cyan('                     │'));
+  console.log(chalk.cyan('│ ') + chalk.bold.white('📂 GitHub:   ') + chalk.blue.underline('https://github.com/SkyLostTR/OST2GO') + chalk.cyan('        │'));
+  console.log(chalk.cyan('│ ') + chalk.bold.white('📦 Project:  ') + chalk.magenta('OST2GO - OST/PST Management Toolkit') + chalk.cyan('        │'));
+  console.log(chalk.cyan('└────────────────────────────────────────────────────────────┘'));
 }
 
 // Get package.json data
 
+// Override help display to show credits and colors
+const originalOutputHelp = program.outputHelp.bind(program);
+program.outputHelp = function(cb) {
+  // Display colorful header
+  console.log(chalk.bold.cyan('\n╔══════════════════════════════════════════════════════════════╗'));
+  console.log(chalk.bold.cyan('║') + chalk.bold.white('                    🚀 OST2GO v' + packageInfo.version + '                      ') + chalk.bold.cyan('║'));
+  console.log(chalk.bold.cyan('╚══════════════════════════════════════════════════════════════╝\n'));
+  
+  // Show credits
+  showCredits();
+  console.log('');
+  
+  // Call original help but with color processing
+  return originalOutputHelp(function(str) {
+    // Remove the plain description line that comes after Usage
+    str = str.replace(/\n\n[A-Z].*OST files with UTF-8 support\n\n/g, '\n\n');
+    
+    // Colorize different parts
+    str = str.replace(/(Usage:)(.+)/g, chalk.bold.yellow('$1') + chalk.white('$2'));
+    str = str.replace(/(Options:)/g, chalk.bold.green('$1'));
+    str = str.replace(/(Commands:)/g, chalk.bold.green('$1'));
+    
+    // Colorize options (flags)
+    str = str.replace(/\s{2}(-[V-Zh-z]),\s(--[\w-]+)/g, '  ' + chalk.cyan('$1') + ', ' + chalk.cyan('$2'));
+    
+    // Colorize command names at start of line
+    str = str.replace(/\n\s{2}(convert|info|extract|validate|help)(\s)/g, '\n  ' + chalk.cyan('$1') + '$2');
+    
+    // Colorize descriptions
+    str = str.replace(/(output the version number)/g, chalk.white('$1'));
+    str = str.replace(/(display help for command)/g, chalk.white('$1'));
+    str = str.replace(/(Convert OST file to PST format)/g, chalk.white('$1'));
+    str = str.replace(/(Display information about an OST file)/g, chalk.white('$1'));
+    str = str.replace(/(Extract emails from OST\/PST file to EML, MBOX, and JSON formats)/g, chalk.white('$1'));
+    str = str.replace(/(Validate PST file integrity and contents using pst-extractor library)/g, chalk.white('$1'));
+    
+    // Add colorful description after Usage
+    const descLine = chalk.bold.cyan('OST2GO') + chalk.gray(' by ') + chalk.green('SkyLostTR') + chalk.gray(' (@Keeftraum)');
+    const desc = chalk.gray('📦 ') + chalk.white(packageInfo.description);
+    const website = chalk.gray('🌐 Website: ') + chalk.blue.underline('https://ost2go.kief.fi');
+    const github = chalk.gray('📂 GitHub: ') + chalk.blue.underline('https://github.com/SkyLostTR/OST2GO');
+    
+    // Insert description after Usage line
+    str = str.replace(/(Usage:.+\n)\n/, `$1\n${descLine}\n${desc}\n${website}\n${github}\n\n`);
+    
+    return str;
+  });
+};
+
 program
   .name('ost2go')
-  .description(`OST2GO by SkyLostTR (@Keeftraum) - ${packageInfo.description}`)
+  .description(packageInfo.description)
   .version(packageInfo.version);
 
 program
@@ -1022,9 +1072,5 @@ program.on('command:*', () => {
   process.exit(1);
 });
 
-// Show help when no command is provided
-if (!process.argv.slice(2).length) {
-  program.outputHelp();
-}
-
+// Commander.js automatically shows help when no command is provided
 program.parse(process.argv);

@@ -1,3 +1,70 @@
+# OST2GO v2.1.2 - Enhanced User Interface
+
+**OST2GO by SkyLostTR (@Keeftraum)**  
+**Website**: https://ost2go.kief.fi  
+**GitHub**: https://github.com/SkyLostTR/OST2GO
+
+## 🎨 What's New in v2.1.2
+
+### Colorful Help Display
+We've completely redesigned the CLI help interface with beautiful colors and better organization!
+
+#### Visual Enhancements
+- 🚀 **Cyan Bordered Header**: Eye-catching header with version number
+- 👤 **Credits Box**: Beautiful cyan-bordered box showing:
+  - Author information (SkyLostTR)
+  - Official website link (https://ost2go.kief.fi) - NEW!
+  - GitHub repository link
+  - Project description
+- 🌈 **Color-Coded Sections**:
+  - Yellow "Usage" section
+  - Green "Options" and "Commands" headers
+  - Cyan command names and option flags
+  - Blue underlined links
+  - White descriptions
+
+#### Website Integration
+- Added official website: **https://ost2go.kief.fi**
+- Prominently displayed in help output with 🌐 emoji
+- Blue underlined link for easy identification
+
+### Bug Fixes
+- Fixed duplicate help message when running without arguments
+- Improved Commander.js integration for cleaner output
+
+## 📸 Preview
+
+```
+╔══════════════════════════════════════════════════════════════╗
+║                    🚀 OST2GO v2.1.2                      ║
+╚══════════════════════════════════════════════════════════════╝
+
+┌────────────────────────────────────────────────────────────┐
+│ 👤 Author:   SkyLostTR (@Keeftraum)                  │
+│ 🌐 Website:  https://ost2go.kief.fi                     │
+│ 📂 GitHub:   https://github.com/SkyLostTR/OST2GO        │
+│ 📦 Project:  OST2GO - OST/PST Management Toolkit        │
+└────────────────────────────────────────────────────────────┘
+```
+
+## 🚀 Quick Start
+
+Try the new colorful interface:
+
+```bash
+# Show help with new colorful display
+ost2go --help
+
+# Check version
+ost2go --version
+
+# See credits and info on every command
+ost2go convert --help
+ost2go extract --help
+```
+
+---
+
 # OST2GO v2.1.0 - Binary Release
 
 **OST2GO by SkyLostTR (@Keeftraum)**

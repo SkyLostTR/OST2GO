@@ -5,6 +5,34 @@ All notable changes to OST2GO will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.2] - 2025-10-17
+
+### 🎨 Enhanced User Interface
+
+#### Added
+- **Colorful Help Display**: Completely redesigned help output with vibrant colors
+  - Cyan bordered header with version display (🚀 OST2GO v2.1.2)
+  - Colorful credits box showing author, website, and GitHub links
+  - Yellow "Usage" section, green "Options" and "Commands" headers
+  - Cyan command and option flags for better readability
+  - White descriptions with proper formatting
+- **Website Integration**: Added official website link (https://ost2go.kief.fi) to help display
+  - Blue underlined links for website and GitHub
+  - Displayed prominently with emoji indicators (🌐 and 📂)
+- **Credits Everywhere**: Credits box now appears on all help displays
+  - Shows on `--help`, `-h`, and when no arguments provided
+  - Enhanced with emojis: 👤 Author, 🌐 Website, 📂 GitHub, 📦 Project
+  - Colorized with cyan borders, green author name, and blue links
+
+#### Changed
+- Upgraded credits display from gray to colorful cyan-bordered box
+- Improved help output formatting with better color coordination
+- Enhanced branding visibility throughout CLI interface
+
+#### Fixed
+- Removed duplicate help message that appeared when running without arguments
+- Fixed redundant help display in Commander.js setup
+
 ## [2.1.0] - 2025-10-17
 
 ### 🚀 Standalone Binary Release
