@@ -745,6 +745,22 @@ body {
     color: var(--primary);
 }
 
+.sponsor-link {
+    color: #238636 !important; /* GitHub green */
+}
+
+.sponsor-link:hover {
+    color: #2ea043 !important; /* Lighter GitHub green */
+}
+
+.bmc-link {
+    color: #ffdd00 !important; /* Buy Me a Coffee yellow */
+}
+
+.bmc-link:hover {
+    color: #ffed4a !important; /* Lighter yellow */
+}
+
 .footer-bottom {
     text-align: center;
     padding-top: 2rem;
