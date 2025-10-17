@@ -44,22 +44,22 @@ ost2go info -i file.ost
 
 ### Extract 10 emails for testing
 ```bash
-ost2go extract -i NK@ON.ost -o test --max 10
+ost2go extract -i your-ost-file.ost -o test --max 10
 ```
 
 ### Extract 1000 emails
 ```bash
-ost2go extract -i NK@ON.ost -o my-emails --max 1000 --verbose
+ost2go extract -i your-ost-file.ost -o my-emails --max 1000 --verbose
 ```
 
 ### Convert to PST (small batch)
 ```bash
-ost2go convert -i NK@ON.ost -o output.pst --real --max-emails 50
+ost2go convert -i your-ost-file.ost -o output.pst --real --max-emails 50
 ```
 
 ### Check file information
 ```bash
-ost2go info -i NK@ON.ost
+ost2go info -i your-ost-file.ost
 ```
 
 ## Common Workflows

@@ -111,21 +111,21 @@ All commands tested successfully:
 
 #### Extract Command
 ```bash
-✅ ost2go extract -i NK@ON.ost -o test-ost2go --max 5
+✅ ost2go extract -i your-ost-file.ost -o test-ost2go --max 5
 Result: 5 emails extracted in 0.3s
 Output: EML files, MBOX, JSON, instructions
 ```
 
 #### Convert Command
 ```bash
-✅ ost2go convert -i NK@ON.ost -o test-output.pst --real --max-emails 3
+✅ ost2go convert -i your-ost-file.ost -o test-output.pst --real --max-emails 3
 Result: 3 emails converted in 323.4s
 Output: PST file created (with known validation issues)
 ```
 
 #### Info Command
 ```bash
-✅ ost2go info -i NK@ON.ost
+✅ ost2go info -i your-ost-file.ost
 Result: File information displayed
 Size: 5058.32 MB, Type: OST
 Recommendations: Use ost2go convert/extract
@@ -227,16 +227,16 @@ ost2go extract -i file.ost
 ### Basic Usage
 ```bash
 # Extract 10 emails for testing
-ost2go extract -i NK@ON.ost -o test --max 10
+ost2go extract -i your-ost-file.ost -o test --max 10
 
 # Convert to PST
-ost2go convert -i NK@ON.ost -o output.pst --real --max-emails 50
+ost2go convert -i your-ost-file.ost -o output.pst --real --max-emails 50
 
 # Validate PST
 ost2go validate -i output.pst
 
 # Get file info
-ost2go info -i NK@ON.ost
+ost2go info -i your-ost-file.ost
 ```
 
 ### Real-World Workflow

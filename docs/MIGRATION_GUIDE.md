@@ -28,12 +28,12 @@ ost2go <subcommand> [options]
 
 **Old Command:**
 ```bash
-node extract-to-eml.js --input=NK@ON.ost --max=100 --output=my-emails --verbose
+node extract-to-eml.js --input=your-ost-file.ost --max=100 --output=my-emails --verbose
 ```
 
 **New Command:**
 ```bash
-ost2go extract -i NK@ON.ost --max 100 -o my-emails --verbose
+ost2go extract -i your-ost-file.ost --max 100 -o my-emails --verbose
 ```
 
 **Changes:**
@@ -153,10 +153,10 @@ ost2go --help
 ### 3. Test Each Command
 ```bash
 # Test extract
-ost2go extract -i NK@ON.ost -o test --max 5
+ost2go extract -i your-ost-file.ost -o test --max 5
 
 # Test info
-ost2go info -i NK@ON.ost
+ost2go info -i your-ost-file.ost
 
 # Test validate (if you have a PST file)
 ost2go validate -i output.pst

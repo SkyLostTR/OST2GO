@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 const buf = Buffer.alloc(512);
-const fd = fs.openSync('NK@ON.ost', 'r');
+const fd = fs.openSync('your-ost-file.ost', 'r');
 fs.readSync(fd, buf, 0, 512, 0);
 fs.closeSync(fd);
 

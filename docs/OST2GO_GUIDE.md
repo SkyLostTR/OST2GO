@@ -157,7 +157,7 @@ ost2go info -i input.ost
 
 1. **Extract emails from OST**
 ```bash
-ost2go extract -i NK@ON.ost -o my-emails --max 500
+ost2go extract -i your-ost-file.ost -o my-emails --max 500
 ```
 
 2. **Import EML files to Outlook**
@@ -174,7 +174,7 @@ ost2go extract -i NK@ON.ost -o my-emails --max 500
 
 ```bash
 # Convert OST to PST using real converter
-ost2go convert -i NK@ON.ost -o output.pst --real --max-emails 100
+ost2go convert -i your-ost-file.ost -o output.pst --real --max-emails 100
 ```
 
 ### Validate the Result

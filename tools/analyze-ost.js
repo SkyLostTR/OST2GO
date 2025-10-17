@@ -93,7 +93,7 @@ async function analyzeOstWithExtractor(ostPath) {
 }
 
 // Try to analyze the OST
-analyzeOstWithExtractor('NK@ON.ost')
+analyzeOstWithExtractor('your-ost-file.ost')
   .then(success => {
     if (success) {
       console.log(chalk.green('\n✅ OST file is readable!'));
@@ -106,7 +106,7 @@ analyzeOstWithExtractor('NK@ON.ost')
       console.log(chalk.gray('   - Kernel for OST to PST'));
       console.log(chalk.gray('   - SysTools OST Converter\n'));
       console.log(chalk.white('3. Use our converter for partial extraction:'));
-      console.log(chalk.gray('   node src/index.js convert -i NK@ON.ost -o output.pst --real --max-emails 50'));
+      console.log(chalk.gray('   node src/index.js convert -i your-ost-file.ost -o output.pst --real --max-emails 50'));
     } else {
       console.log(chalk.yellow('\n💡 The OST file has Exchange-specific structures.'));
       console.log(chalk.cyan('You MUST use one of these methods:\n'));

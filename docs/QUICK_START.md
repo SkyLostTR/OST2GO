@@ -10,7 +10,7 @@ cd C:\Users\EAKTRAVIOUS\O2PT
 npm install
 
 # 3. Extract emails from OST
-node extract-to-eml.js --input=NK@ON.ost --max=100 --output=my-emails
+node extract-to-eml.js --input=your-ost-file.ost --max=100 --output=my-emails
 ```
 
 ## Command Syntax
@@ -29,19 +29,19 @@ node extract-to-eml.js --input=<OST-FILE> --max=<NUMBER> --output=<FOLDER> [--ve
 
 ```powershell
 # Extract 100 emails (clean output)
-node extract-to-eml.js --input=NK@ON.ost --max=100 --output=my-emails
+node extract-to-eml.js --input=your-ost-file.ost --max=100 --output=my-emails
 
 # Extract with detailed warnings
-node extract-to-eml.js --input=NK@ON.ost --max=100 --output=my-emails --verbose
+node extract-to-eml.js --input=your-ost-file.ost --max=100 --output=my-emails --verbose
 
 # Extract 1000 emails
-node extract-to-eml.js --input=NK@ON.ost --max=1000 --output=backup
+node extract-to-eml.js --input=your-ost-file.ost --max=1000 --output=backup
 
 # Extract from different file
 node extract-to-eml.js -i="C:\data\mailbox.ost" --max=500
 
 # Use default output folder
-node extract-to-eml.js --input=NK@ON.ost --max=200
+node extract-to-eml.js --input=your-ost-file.ost --max=200
 ```
 
 ## What You Get
@@ -70,10 +70,10 @@ my-emails/
 ### "Input file not found"
 ```powershell
 # Check file exists
-Test-Path "NK@ON.ost"
+Test-Path "your-ost-file.ost"
 
 # Use full path
-node extract-to-eml.js --input="C:\Users\EAKTRAVIOUS\O2PT\NK@ON.ost"
+node extract-to-eml.js --input="C:\Users\EAKTRAVIOUS\O2PT\your-ost-file.ost"
 ```
 
 ### Skipped Attachments (Normal)
@@ -86,13 +86,13 @@ This is **normal** - some attachments use incompatible compression. The script h
 ### Out of Memory
 ```powershell
 # Reduce batch size
-node extract-to-eml.js --input=NK@ON.ost --max=50
+node extract-to-eml.js --input=your-ost-file.ost --max=50
 ```
 
 ### Want to See Details?
 ```powershell
 # Use verbose mode
-node extract-to-eml.js --input=NK@ON.ost --max=100 --verbose
+node extract-to-eml.js --input=your-ost-file.ost --max=100 --verbose
 ```
 
 ## Need Help?
