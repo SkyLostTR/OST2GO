@@ -1,0 +1,69 @@
+# OST2GO - npm Package Exclusions
+
+# Development files
+.github/
+.vscode/
+test/
+tools/
+docs/BUILD_GUIDE.md
+docs/CI_CD_REFERENCE.md
+docs/PUBLISHING_GUIDE.md
+BUILD_SUCCESS.md
+RELEASE_NOTES.md
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# Build artifacts (binaries are too large for npm)
+dist/
+
+# IDE and editor files
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Documentation (keep only essential)
+docs/MIGRATION_GUIDE.md
+docs/TECHNICAL-LIMITATIONS.md
+
+# Keep these files
+!README.md
+!CHANGELOG.md
+!LICENSE
+!package.json
+!bin/
+!src/
+!docs/QUICK_START.md
+!docs/QUICK_REFERENCE.md
+!docs/OST2GO_GUIDE.md
+!docs/OST2GO_COMPLETE.md
+!docs/README.md
+*.ost
+*.pst
+*.eml
+*.mbox
+*.txt

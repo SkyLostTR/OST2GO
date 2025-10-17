@@ -1,0 +1,201 @@
+name: Publish Package
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'package.json'
+  workflow_dispatch:
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version-changed: ${{ steps.check.outputs.changed }}
+      version: ${{ steps.check.outputs.version }}
+      tag-exists: ${{ steps.check.outputs.tag-exists }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check if version changed
+        id: check
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          
+          # Check if this is the first commit or if package.json changed
+          if git diff HEAD^ HEAD --name-only | grep -q "package.json"; then
+            PREVIOUS_VERSION=$(git show HEAD^:package.json | node -p "JSON.parse(require('fs').readFileSync('/dev/stdin', 'utf-8')).version" 2>/dev/null || echo "0.0.0")
+            
+            if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+              echo "changed=true" >> $GITHUB_OUTPUT
+              echo "Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+            else
+              echo "changed=false" >> $GITHUB_OUTPUT
+              echo "Version unchanged: $CURRENT_VERSION"
+            fi
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "package.json not modified"
+          fi
+          
+          # Check if tag already exists
+          if git rev-parse "v$CURRENT_VERSION" >/dev/null 2>&1; then
+            echo "tag-exists=true" >> $GITHUB_OUTPUT
+            echo "Tag v$CURRENT_VERSION already exists"
+          else
+            echo "tag-exists=false" >> $GITHUB_OUTPUT
+            echo "Tag v$CURRENT_VERSION does not exist"
+          fi
+
+  publish:
+    needs: check-version
+    if: needs.check-version.outputs.version-changed == 'true' && needs.check-version.outputs.tag-exists == 'false'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+        continue-on-error: true
+
+      - name: Build binaries
+        run: npm run build:all
+        continue-on-error: true
+
+      - name: Generate checksums
+        if: success()
+        run: |
+          cd dist
+          sha256sum ost2go-linux > checksums.txt
+          sha256sum ost2go-macos >> checksums.txt
+          sha256sum ost2go-win.exe >> checksums.txt
+          cat checksums.txt
+
+      - name: Extract changelog for version
+        id: changelog
+        run: |
+          VERSION="${{ needs.check-version.outputs.version }}"
+          
+          # Extract changelog section for current version
+          if [ -f "CHANGELOG.md" ]; then
+            # Get content between current version and next version header or end
+            CHANGELOG=$(awk "/## \[$VERSION\]/,/## \[.*\]/{if(/## \[.*\]/ && !/## \[$VERSION\]/)exit;print}" CHANGELOG.md | tail -n +2)
+            
+            if [ -z "$CHANGELOG" ]; then
+              CHANGELOG="No changelog entry found for version $VERSION"
+            fi
+            
+            # Save to file for GitHub release
+            echo "$CHANGELOG" > /tmp/changelog.txt
+            echo "found=true" >> $GITHUB_OUTPUT
+          else
+            echo "No CHANGELOG.md found" > /tmp/changelog.txt
+            echo "found=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${{ needs.check-version.outputs.version }}" -m "Release v${{ needs.check-version.outputs.version }}"
+          git push origin "v${{ needs.check-version.outputs.version }}"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ needs.check-version.outputs.version }}
+          name: OST2GO v${{ needs.check-version.outputs.version }}
+          body_path: /tmp/changelog.txt
+          files: |
+            dist/ost2go-win.exe
+            dist/ost2go-linux
+            dist/ost2go-macos
+            dist/checksums.txt
+            dist/README.md
+            dist/CHECKSUMS.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Setup Node.js for GitHub Packages
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@skylosttr'
+
+      - name: Configure package for GitHub Packages
+        run: |
+          # Backup original package.json
+          cp package.json package.json.bak
+          
+          # Update package name for GitHub Packages
+          node -e "
+            const pkg = require('./package.json');
+            pkg.name = '@skylosttr/ost2go';
+            pkg.publishConfig = {
+              registry: 'https://npm.pkg.github.com'
+            };
+            require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+          "
+
+      - name: Publish to GitHub Packages
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Restore original package.json
+        if: always()
+        run: |
+          if [ -f "package.json.bak" ]; then
+            mv package.json.bak package.json
+          fi
+
+      - name: Notify success
+        if: success()
+        run: |
+          echo "✅ Successfully published OST2GO v${{ needs.check-version.outputs.version }}"
+          echo "📦 npm: https://www.npmjs.com/package/ost2go"
+          echo "📦 GitHub: https://github.com/SkyLostTR/O2PT/packages"
+          echo "🚀 Release: https://github.com/SkyLostTR/O2PT/releases/tag/v${{ needs.check-version.outputs.version }}"
+
+  skip:
+    needs: check-version
+    if: needs.check-version.outputs.version-changed != 'true' || needs.check-version.outputs.tag-exists == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip publishing
+        run: |
+          if [ "${{ needs.check-version.outputs.tag-exists }}" == "true" ]; then
+            echo "⏭️ Skipping publish - Tag v${{ needs.check-version.outputs.version }} already exists"
+          else
+            echo "⏭️ Skipping publish - Version unchanged in package.json"
+          fi

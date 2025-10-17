@@ -1,0 +1,122 @@
+name: Build Binaries
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            target: node18-linux-x64
+            output: ost2go-linux
+          - os: macos-latest
+            platform: macos
+            target: node18-macos-x64
+            output: ost2go-macos
+          - os: windows-latest
+            platform: windows
+            target: node18-win-x64
+            output: ost2go-win.exe
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build binary
+        run: npx pkg . --target ${{ matrix.target }} --output dist/${{ matrix.output }}
+
+      - name: Generate checksum (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          cd dist
+          sha256sum ${{ matrix.output }} > ${{ matrix.output }}.sha256
+
+      - name: Generate checksum (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cd dist
+          Get-FileHash ${{ matrix.output }} -Algorithm SHA256 | Select-Object Hash | Out-File -FilePath ${{ matrix.output }}.sha256
+        shell: pwsh
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.platform }}-binary
+          path: |
+            dist/${{ matrix.output }}
+            dist/${{ matrix.output }}.sha256
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+
+      - name: Prepare release files
+        run: |
+          mkdir -p release
+          find artifacts -type f -exec cp {} release/ \;
+          ls -lh release/
+          
+          # Create combined checksums file
+          cd release
+          cat *.sha256 > checksums.txt
+          echo "📋 All checksums:"
+          cat checksums.txt
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Extract changelog
+        id: changelog
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          
+          if [ -f "CHANGELOG.md" ]; then
+            CHANGELOG=$(awk "/## \[$VERSION\]/,/## \[.*\]/{if(/## \[.*\]/ && !/## \[$VERSION\]/)exit;print}" CHANGELOG.md | tail -n +2)
+            
+            if [ -z "$CHANGELOG" ]; then
+              CHANGELOG="Release version $VERSION"
+            fi
+            
+            echo "$CHANGELOG" > /tmp/changelog.txt
+          else
+            echo "Release version $VERSION" > /tmp/changelog.txt
+          fi
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: OST2GO v${{ steps.version.outputs.version }}
+          body_path: /tmp/changelog.txt
+          files: release/*
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

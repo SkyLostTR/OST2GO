@@ -1,0 +1,227 @@
+name: Manual Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 2.1.0)'
+        required: true
+        type: string
+      publish-npm:
+        description: 'Publish to npm'
+        required: true
+        type: boolean
+        default: true
+      publish-github:
+        description: 'Publish to GitHub Packages'
+        required: true
+        type: boolean
+        default: true
+      create-release:
+        description: 'Create GitHub Release'
+        required: true
+        type: boolean
+        default: true
+      build-binaries:
+        description: 'Build platform binaries'
+        required: true
+        type: boolean
+        default: true
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate version format
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
+            echo "❌ Invalid version format: $VERSION"
+            echo "Expected format: X.Y.Z or X.Y.Z-prerelease"
+            exit 1
+          fi
+          echo "✅ Version format valid: $VERSION"
+
+      - name: Check if version exists
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          INPUT_VERSION="${{ github.event.inputs.version }}"
+          
+          if [ "$CURRENT_VERSION" != "$INPUT_VERSION" ]; then
+            echo "⚠️ Warning: package.json version ($CURRENT_VERSION) differs from input version ($INPUT_VERSION)"
+            echo "Will use input version: $INPUT_VERSION"
+          fi
+          
+          if git rev-parse "v$INPUT_VERSION" >/dev/null 2>&1; then
+            echo "❌ Tag v$INPUT_VERSION already exists!"
+            exit 1
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Update version in package.json
+        run: |
+          npm version ${{ github.event.inputs.version }} --no-git-tag-version
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json
+          git commit -m "chore: bump version to ${{ github.event.inputs.version }}"
+          git push
+
+      - name: Run tests
+        run: npm test
+        continue-on-error: true
+
+      - name: Build binaries
+        if: github.event.inputs.build-binaries == 'true'
+        run: npm run build:all
+
+      - name: Generate checksums
+        if: github.event.inputs.build-binaries == 'true'
+        run: |
+          cd dist
+          sha256sum ost2go-linux > checksums.txt
+          sha256sum ost2go-macos >> checksums.txt
+          sha256sum ost2go-win.exe >> checksums.txt
+          echo "📋 Checksums:"
+          cat checksums.txt
+
+      - name: Extract changelog
+        id: changelog
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          
+          if [ -f "CHANGELOG.md" ]; then
+            CHANGELOG=$(awk "/## \[$VERSION\]/,/## \[.*\]/{if(/## \[.*\]/ && !/## \[$VERSION\]/)exit;print}" CHANGELOG.md | tail -n +2)
+            
+            if [ -z "$CHANGELOG" ]; then
+              CHANGELOG="Release version $VERSION"
+            fi
+            
+            echo "$CHANGELOG" > /tmp/changelog.txt
+          else
+            echo "Release version $VERSION" > /tmp/changelog.txt
+          fi
+
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${{ github.event.inputs.version }}" -m "Release v${{ github.event.inputs.version }}"
+          git push origin "v${{ github.event.inputs.version }}"
+
+      - name: Create GitHub Release
+        if: github.event.inputs.create-release == 'true'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          name: OST2GO v${{ github.event.inputs.version }}
+          body_path: /tmp/changelog.txt
+          files: |
+            dist/ost2go-win.exe
+            dist/ost2go-linux
+            dist/ost2go-macos
+            dist/checksums.txt
+            dist/README.md
+            dist/CHECKSUMS.md
+          draft: false
+          prerelease: ${{ github.event.inputs.prerelease }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to npm
+        if: github.event.inputs.publish-npm == 'true'
+        run: |
+          echo "📦 Publishing to npm..."
+          npm publish --access public
+          echo "✅ Published to npm"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Setup Node.js for GitHub Packages
+        if: github.event.inputs.publish-github == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@skylosttr'
+
+      - name: Publish to GitHub Packages
+        if: github.event.inputs.publish-github == 'true'
+        run: |
+          # Backup and modify package.json for GitHub Packages
+          cp package.json package.json.bak
+          
+          node -e "
+            const pkg = require('./package.json');
+            pkg.name = '@skylosttr/ost2go';
+            pkg.publishConfig = {
+              registry: 'https://npm.pkg.github.com'
+            };
+            require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+          "
+          
+          echo "📦 Publishing to GitHub Packages..."
+          npm publish
+          echo "✅ Published to GitHub Packages"
+          
+          # Restore original
+          mv package.json.bak package.json
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## 🚀 Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ github.event.inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Pre-release:** ${{ github.event.inputs.prerelease }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Actions Taken:" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Version updated in package.json" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Git tag created: v${{ github.event.inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ github.event.inputs.create-release }}" == "true" ]; then
+            echo "- ✅ GitHub Release created" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ github.event.inputs.build-binaries }}" == "true" ]; then
+            echo "- ✅ Binaries built for Windows, Linux, macOS" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ github.event.inputs.publish-npm }}" == "true" ]; then
+            echo "- ✅ Published to npm: https://www.npmjs.com/package/ost2go" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ github.event.inputs.publish-github }}" == "true" ]; then
+            echo "- ✅ Published to GitHub Packages" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Links:" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔗 [Release Page](https://github.com/SkyLostTR/O2PT/releases/tag/v${{ github.event.inputs.version }})" >> $GITHUB_STEP_SUMMARY
+          echo "- 📦 [npm Package](https://www.npmjs.com/package/ost2go)" >> $GITHUB_STEP_SUMMARY
+          echo "- 📦 [GitHub Packages](https://github.com/SkyLostTR/O2PT/packages)" >> $GITHUB_STEP_SUMMARY

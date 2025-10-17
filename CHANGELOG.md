@@ -23,15 +23,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `npm run build:all` - Build all with default naming
 - **Build Documentation**: Comprehensive build guide in `docs/BUILD_GUIDE.md`
 - **Binary Distribution Guide**: Installation instructions in `dist/README.md`
+- **CI/CD Automation**: GitHub Actions workflows for automated publishing
+  - Automatic publish on version change (`publish.yml`)
+  - Manual release workflow with options (`release.yml`)
+  - Binary building workflow (`build-binaries.yml`)
+- **Publishing Documentation**:
+  - Complete publishing guide in `docs/PUBLISHING_GUIDE.md`
+  - Quick reference in `docs/CI_CD_REFERENCE.md`
+  - GitHub setup guide in `docs/GITHUB_SETUP.md`
+- **npm Package Publishing**: Automated publishing to npm on version changes
+- **GitHub Packages Publishing**: Automated publishing to GitHub Packages
+- **GitHub Releases**: Automated release creation with binaries and checksums
+- **Package Exclusions**: `.npmignore` file to control published package contents
 
 #### Changed
 - Updated `package.json` with pkg configuration and build scripts
 - Added `pkg` as development dependency
+- Updated README.md with multiple installation options
+- Updated badges in README.md to reflect new version and build status
 
 #### Technical
 - Uses `pkg` (v5.8.1) to create standalone executables
 - Includes all dependencies in binaries
 - Based on Node.js v18.5.0 runtime
+- Automated version detection and changelog extraction
+- SHA256 checksum generation for all binaries
+- Multi-platform builds with GitHub Actions
+- Automatic tagging and release notes from CHANGELOG.md
 
 ## [2.0.0] - 2025-01-17
 

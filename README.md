@@ -4,23 +4,70 @@
 > **Complete OST/PST Management Toolkit**  
 > *Convert, extract, and manage Microsoft Outlook OST files with ease*
 
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/SkyLostTR/OST2GO)
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://github.com/SkyLostTR/OST2GO)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](./LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen.svg)](https://nodejs.org)
+[![NPM](https://img.shields.io/npm/v/ost2go.svg)](https://www.npmjs.com/package/ost2go)
 [![NPM Downloads](https://img.shields.io/npm/dt/ost2go.svg)](https://www.npmjs.com/package/ost2go)
 [![Package Size](https://img.shields.io/bundlephobia/min/ost2go.svg)](https://bundlephobia.com/result?p=ost2go)
 [![GitHub Stars](https://img.shields.io/github/stars/SkyLostTR/OST2GO.svg)](https://github.com/SkyLostTR/OST2GO/stargazers)
 [![GitHub Issues](https://img.shields.io/github/issues/SkyLostTR/OST2GO.svg)](https://github.com/SkyLostTR/OST2GO/issues)
-[![GitHub PRs](https://img.shields.io/github/issues-pr/SkyLostTR/OST2GO.svg)](https://github.com/SkyLostTR/OST2GO/pulls)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)](https://github.com/SkyLostTR/OST2GO)
-[![Last Commit](https://img.shields.io/github/last-commit/SkyLostTR/OST2GO.svg)](https://github.com/SkyLostTR/OST2GO/commits/master)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/SkyLostTR/OST2GO/ci.yml?branch=master)](https://github.com/SkyLostTR/OST2GO/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/SkyLostTR/OST2GO/publish.yml?branch=main)](https://github.com/SkyLostTR/OST2GO/actions)
 
 **Created by [SkyLostTR](https://github.com/SkyLostTR) (@Keeftraum)**
 
 ---
 
-**Version 2.0.0** - A unified Node.js application for converting, extracting, and managing Microsoft Outlook OST and PST files with UTF-8 support.
+**Version 2.1.0** - A unified Node.js application for converting, extracting, and managing Microsoft Outlook OST and PST files with UTF-8 support.
+
+## 📦 Installation
+
+### Option 1: npm (Recommended)
+```bash
+# Install globally from npm
+npm install -g ost2go
+
+# Verify installation
+ost2go --version
+```
+
+### Option 2: Standalone Binaries (No Node.js Required)
+Download pre-built binaries from [Releases](https://github.com/SkyLostTR/OST2GO/releases):
+- **Windows**: `ost2go-win.exe`
+- **Linux**: `ost2go-linux`
+- **macOS**: `ost2go-macos`
+
+```bash
+# Windows
+.\ost2go-win.exe --version
+
+# Linux/macOS
+chmod +x ost2go-linux
+./ost2go-linux --version
+```
+
+### Option 3: From Source
+```bash
+# Clone repository
+git clone https://github.com/SkyLostTR/OST2GO.git
+cd OST2GO
+
+# Install dependencies
+npm install
+
+# Install globally
+npm install -g .
+```
+
+### Option 4: GitHub Packages
+```bash
+# Configure registry
+echo "@skylosttr:registry=https://npm.pkg.github.com" >> .npmrc
+
+# Install
+npm install -g @skylosttr/ost2go
+```
 
 ## 🎯 What's New in Version 2.0
 
@@ -118,28 +165,8 @@ This project demonstrates:
 - **💻 Command Line Interface**: Easy-to-use CLI with comprehensive options
 - **🛠️ Advanced Error Handling**: Detailed error reporting and troubleshooting
 - **📁 PST Format Compliance**: Proper header structure and block alignment
-
-## 📦 Installation
-
-1. **✅ Make sure you have Node.js 16+ installed**
-2. **📥 Clone or download this project**
-3. **🔧 Install dependencies:**
-
-```bash
-npm install
-```
-
-## 📖 Quick Start Guide
-
-### Installation
-
-```bash
-# Install globally
-npm install -g .
-
-# Verify installation
-ost2go --help
-```
+- **� Standalone Binaries**: No Node.js required for end users
+- **� Multiple Distribution Channels**: npm, GitHub Packages, and standalone binaries
 
 ### 💡 Usage Examples
 
