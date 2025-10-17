@@ -209,4 +209,3 @@ This website and its documentation are part of the OST2GO project. See [LICENSE]
 **OST2GO Documentation Website**
 *Built for developers, by developers*
 [https://ost2go.kief.fi](https://ost2go.kief.fi)</content>
-<parameter name="filePath">c:\Users\EAKTRAVIOUS\O2PT\README.md
