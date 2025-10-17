@@ -1,0 +1,13 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "OST to PST Converter",
+			"type": "shell",
+			"command": "node src/index.js convert -i yourfile.ost -o output.pst --real --max-emails 5",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}
