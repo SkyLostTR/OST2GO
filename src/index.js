@@ -551,36 +551,191 @@ program
                   const attach = msg.getAttachment(i);
                   if (attach) {
                     let attachData = null;
+                    let extractionMethod = 'none';
+                    
+                    // Method 1: Try fileInputStream with improved block reading
                     try {
                       const stream = attach.fileInputStream;
                       if (stream) {
-                        const chunks = [];
-                        let totalSize = 0;
-                        const bufferSize = 8176;
-                        const buffer = Buffer.alloc(bufferSize);
-
-                        try {
-                          let bytesRead = stream.read(buffer);
-                          while (bytesRead > 0) {
-                            chunks.push(Buffer.from(buffer.slice(0, bytesRead)));
-                            totalSize += bytesRead;
-                            bytesRead = stream.read(buffer);
+                        // First check if allData is available (already decompressed)
+                        if (stream.allData && stream.allData.length > 0) {
+                          attachData = stream.allData;
+                          extractionMethod = 'stream-alldata';
+                        }
+                        // Check if we can read blocks directly (for problematic compressions)
+                        else if (stream.indexItems && stream.indexItems.length > 0) {
+                          const chunks = [];
+                          let totalSize = 0;
+                          const zlib = require('zlib');
+                          
+                          for (const item of stream.indexItems) {
+                            try {
+                              const blockBuffer = Buffer.alloc(item.size);
+                              attach.pstFile.seek(item.fileOffset);
+                              attach.pstFile.readCompletely(blockBuffer);
+                              
+                              // Check if zlib compressed
+                              if (blockBuffer.length > 2 && blockBuffer[0] === 0x78 && blockBuffer[1] === 0x9c) {
+                                try {
+                                  const decompressed = zlib.unzipSync(blockBuffer);
+                                  chunks.push(decompressed);
+                                  totalSize += decompressed.length;
+                                } catch (err) {
+                                  // Decompression failed, use raw
+                                  chunks.push(blockBuffer);
+                                  totalSize += blockBuffer.length;
+                                }
+                              } else {
+                                chunks.push(blockBuffer);
+                                totalSize += blockBuffer.length;
+                              }
+                            } catch (blockErr) {
+                              // Skip bad blocks
+                            }
                           }
-
-                          if (totalSize > 0) {
+                          
+                          if (chunks.length > 0) {
                             attachData = Buffer.concat(chunks, totalSize);
+                            extractionMethod = 'stream-blocks';
                           }
-                        } catch (zlibErr) {
-                          skippedAttachments++;
-                          if (options.verbose) {
-                            console.log(chalk.gray(`    ⚠️  Skipping attachment ${i} (compression error)`));
+                        }
+                        // Fall back to normal stream reading
+                        else {
+                          const chunks = [];
+                          let totalSize = 0;
+                          const bufferSize = 8176;
+                          const buffer = Buffer.alloc(bufferSize);
+
+                          try {
+                            let bytesRead = stream.read(buffer);
+                            while (bytesRead > 0) {
+                              chunks.push(Buffer.from(buffer.slice(0, bytesRead)));
+                              totalSize += bytesRead;
+                              bytesRead = stream.read(buffer);
+                            }
+
+                            if (totalSize > 0) {
+                              attachData = Buffer.concat(chunks, totalSize);
+                              extractionMethod = 'stream';
+                            }
+                          } catch (zlibErr) {
+                            // Compression error - try alternative method
+                            if (options.verbose) {
+                              console.log(chalk.yellow(`    ⚠️  Compression error on ${attach.longFilename || attach.filename || `attachment${i}`}, trying alternative method...`));
+                            }
                           }
                         }
                       }
                     } catch (streamErr) {
+                      // Stream error - try alternative method
+                      if (options.verbose) {
+                        console.log(chalk.yellow(`    ⚠️  Stream error on ${attach.longFilename || attach.filename || `attachment${i}`}, trying alternative method...`));
+                      }
+                    }
+                    
+                    // Method 2: Try direct property table access before decompression
+                    if (!attachData) {
+                      try {
+                        // Try to get PidTagAttachDataBinary (0x3701) - the raw property
+                        const dataProperty = attach.pstTableItems?.get(0x3701);
+                        if (dataProperty) {
+                          // If it's an external reference, we need to get the descriptor item
+                          if (dataProperty.isExternalValueReference) {
+                            const descriptorItem = attach.localDescriptorItems?.get(dataProperty.entryValueReference);
+                            if (descriptorItem) {
+                              // Try to read the raw data from the PST file
+                              try {
+                                // Get the offset item and read raw data
+                                const Long = require('long');
+                                const offsetId = Long.isLong(descriptorItem.offsetIndexIdentifier) 
+                                  ? descriptorItem.offsetIndexIdentifier 
+                                  : Long.fromNumber(descriptorItem.offsetIndexIdentifier);
+                                  
+                                const offsetItem = attach.pstFile.getOffsetIndexNode(offsetId);
+                                if (offsetItem) {
+                                  const rawBuffer = Buffer.alloc(offsetItem.size);
+                                  attach.pstFile.seek(offsetItem.fileOffset);
+                                  attach.pstFile.readCompletely(rawBuffer);
+                                  
+                                  // Try to decompress manually with better error handling
+                                  if (rawBuffer.length > 2 && rawBuffer[0] === 0x78 && rawBuffer[1] === 0x9c) {
+                                    // This is zlib compressed
+                                    try {
+                                      const zlib = require('zlib');
+                                      attachData = zlib.unzipSync(rawBuffer);
+                                      extractionMethod = 'manual-zlib';
+                                      if (options.verbose) {
+                                        console.log(chalk.green(`    ✅ Extracted ${attach.longFilename || attach.filename || `attachment${i}`} using manual zlib decompression (${attachData.length} bytes)`));
+                                      }
+                                    } catch (zlibManualErr) {
+                                      // Try inflateSync as alternative
+                                      try {
+                                        const zlib = require('zlib');
+                                        attachData = zlib.inflateSync(rawBuffer);
+                                        extractionMethod = 'manual-inflate';
+                                        if (options.verbose) {
+                                          console.log(chalk.green(`    ✅ Extracted ${attach.longFilename || attach.filename || `attachment${i}`} using manual inflate (${attachData.length} bytes)`));
+                                        }
+                                      } catch (inflateErr) {
+                                        if (options.verbose) {
+                                          console.log(chalk.yellow(`    ⚠️  Manual decompression failed, using raw compressed data (${rawBuffer.length} bytes)`));
+                                        }
+                                        // Use the raw compressed data as last resort
+                                        attachData = rawBuffer;
+                                        extractionMethod = 'raw-compressed';
+                                      }
+                                    }
+                                  } else {
+                                    // Not compressed, use as-is
+                                    attachData = rawBuffer;
+                                    extractionMethod = 'raw-uncompressed';
+                                    if (options.verbose && attachData.length > 0) {
+                                      console.log(chalk.green(`    ✅ Extracted ${attach.longFilename || attach.filename || `attachment${i}`} using raw method (${attachData.length} bytes)`));
+                                    }
+                                  }
+                                }
+                              } catch (rawErr) {
+                                if (options.verbose) {
+                                  console.log(chalk.gray(`    ⚠️  Raw data extraction error: ${rawErr.message}`));
+                                }
+                              }
+                            }
+                          } else if (dataProperty.data) {
+                            // Internal value reference
+                            attachData = dataProperty.data;
+                            extractionMethod = 'property-internal';
+                            if (options.verbose) {
+                              console.log(chalk.green(`    ✅ Extracted ${attach.longFilename || attach.filename || `attachment${i}`} using internal property`));
+                            }
+                          }
+                        }
+                      } catch (propErr) {
+                        if (options.verbose) {
+                          console.log(chalk.gray(`    ⚠️  Property method error: ${propErr.message}`));
+                        }
+                      }
+                    }
+                    
+                    // Method 3: Try attachDataBinary property
+                    if (!attachData && attach.attachDataBinary) {
+                      try {
+                        attachData = attach.attachDataBinary;
+                        extractionMethod = 'binary';
+                        if (options.verbose) {
+                          console.log(chalk.green(`    ✅ Extracted ${attach.longFilename || attach.filename || `attachment${i}`} using binary method`));
+                        }
+                      } catch (binaryErr) {
+                        if (options.verbose) {
+                          console.log(chalk.gray(`    ⚠️  Binary extraction failed`));
+                        }
+                      }
+                    }
+                    
+                    // If all methods failed
+                    if (!attachData) {
                       skippedAttachments++;
                       if (options.verbose) {
-                        console.log(chalk.gray(`    ⚠️  Attachment ${i} stream error`));
+                        console.log(chalk.red(`    ❌ Failed to extract ${attach.longFilename || attach.filename || `attachment${i}`} - all methods failed`));
                       }
                     }
 
@@ -588,13 +743,14 @@ program
                       filename: attach.longFilename || attach.filename || `attachment${i}`,
                       mimeType: attach.mimeTag || 'application/octet-stream',
                       size: attach.attachSize || 0,
-                      data: attachData
+                      data: attachData,
+                      extractionMethod: extractionMethod
                     });
                   }
                 } catch (e) {
                   skippedAttachments++;
                   if (options.verbose) {
-                    console.log(chalk.gray(`    ⚠️  Attachment ${i} error`));
+                    console.log(chalk.red(`    ❌ Attachment ${i} error: ${e.message}`));
                   }
                 }
               }
