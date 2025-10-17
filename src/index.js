@@ -21,6 +21,114 @@ const { PSTFile } = require('pst-extractor');
 
 const program = new Command();
 
+/**
+ * Helper function to format ETA in seconds and minutes
+ * @param {number} eta - ETA in seconds
+ * @returns {string} Formatted ETA string
+ */
+function formatETA(eta) {
+  if (isNaN(eta) || eta === Infinity || eta < 0 || eta === 0) {
+    return '--';
+  }
+  
+  const totalSeconds = Math.round(eta);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  
+  if (minutes > 0) {
+    return `${minutes}m ${seconds}s`;
+  }
+  return `${seconds}s`;
+}
+
+/**
+ * Create a custom ProgressBar with formatted ETA in minutes and seconds
+ */
+function createProgressBar(format, options) {
+  // We'll manually manage the progress display
+  let bar = null;
+  let startTime = Date.now();
+  let lastRenderTime = 0;
+  const renderThrottle = options.renderThrottle || 16;
+  
+  // Create a wrapper object that mimics ProgressBar interface
+  const wrapper = {
+    curr: 0,
+    total: options.total,
+    startTime: startTime,
+    
+    tick: function(len = 1, tokens = {}) {
+      this.curr += len;
+      if (this.curr > this.total) this.curr = this.total;
+      
+      // Throttle rendering
+      const now = Date.now();
+      if (now - lastRenderTime < renderThrottle && this.curr < this.total) {
+        return;
+      }
+      lastRenderTime = now;
+      
+      // Calculate ETA
+      const elapsed = (now - startTime) / 1000;
+      const rate = this.curr / elapsed;
+      const remaining = this.total - this.curr;
+      const eta = remaining > 0 && rate > 0 ? remaining / rate : 0;
+      
+      // Build the progress bar manually
+      const percent = Math.floor((this.curr / this.total) * 100);
+      const ratio = this.curr / this.total;
+      const width = options.width || 40;
+      const complete = Math.floor(width * ratio);
+      const incomplete = width - complete;
+      
+      const completeChar = options.complete || '█';
+      const incompleteChar = options.incomplete || '░';
+      
+      let bar = '[';
+      for (let i = 0; i < complete; i++) bar += completeChar;
+      for (let i = 0; i < incomplete; i++) bar += incompleteChar;
+      bar += ']';
+      
+      // Build the display line
+      let line = format
+        .replace(':bar', bar)
+        .replace(':current', this.curr.toString())
+        .replace(':total', this.total.toString())
+        .replace(':percent', percent + '%');
+      
+      // Add ETA
+      line += chalk.magenta(' ETA: ' + formatETA(eta));
+      
+      // Clear line and write
+      process.stdout.clearLine(0);
+      process.stdout.cursorTo(0);
+      process.stdout.write(line);
+    },
+    
+    update: function(ratio, tokens = {}) {
+      this.curr = Math.floor(ratio * this.total);
+      this.tick(0, tokens);
+    },
+    
+    terminate: function() {
+      process.stdout.write('\n');
+    }
+  };
+  
+  return wrapper;
+}
+
+/**
+ * Display credits header for commands
+ */
+function showCredits() {
+  console.log(chalk.gray('┌────────────────────────────────────────────────────────────┐'));
+  console.log(chalk.gray('│ ') + chalk.cyan('Author:   ') + chalk.white('SkyLostTR (@Keeftraum)') + chalk.gray('                       │'));
+  console.log(chalk.gray('│ ') + chalk.cyan('GitHub:   ') + chalk.white('https://github.com/SkyLostTR/OST2GO') + chalk.gray('        │'));
+  console.log(chalk.gray('│ ') + chalk.cyan('Project:  ') + chalk.white('OST2GO - OST/PST Management Toolkit') + chalk.gray('        │'));
+  console.log(chalk.gray('└────────────────────────────────────────────────────────────┘'));
+}
+
 program
   .name('ost2go')
   .description('OST2GO by SkyLostTR (@Keeftraum) - Complete OST/PST management toolkit')
@@ -43,6 +151,7 @@ program
       console.log(chalk.bold.cyan('\n╔══════════════════════════════════════════════════════════════╗'));
       console.log(chalk.bold.cyan('║') + chalk.bold.white('              🚀 OST to PST Converter v2.0') + chalk.bold.cyan('               ║'));
       console.log(chalk.bold.cyan('╚══════════════════════════════════════════════════════════════╝'));
+      showCredits();
 
       // Check if user wants real conversion
       if (options.real) {
@@ -53,8 +162,8 @@ program
         const maxEmails = parseInt(options.maxEmails) || 50;
 
         // Setup progress bar for real conversion
-        const progressBar = new ProgressBar(
-          chalk.cyan('🔄 Converting: ') + chalk.white('[:bar] ') + chalk.yellow(':current/:total ') + chalk.gray('(:percent)') + chalk.magenta(' ETA: :etas'),
+        const progressBar = createProgressBar(
+          chalk.cyan('🔄 Converting: ') + chalk.white('[:bar] ') + chalk.yellow(':current/:total ') + chalk.gray('(:percent)'),
           {
             total: 4, // 4 main steps
             width: 40,
@@ -167,8 +276,8 @@ program
       console.log();
 
       // Setup progress bar for legacy conversion
-      const progressBar = new ProgressBar(
-        chalk.cyan('🔄 Converting: ') + chalk.white('[:bar] ') + chalk.gray('(:percent)') + chalk.magenta(' ETA: :etas'),
+      const progressBar = createProgressBar(
+        chalk.cyan('🔄 Converting: ') + chalk.white('[:bar] ') + chalk.gray('(:percent)'),
         {
           total: 100, // Simulate progress for legacy converter
           width: 40,
@@ -237,6 +346,7 @@ program
       console.log(chalk.bold.cyan('\n╔══════════════════════════════════════════════════════════════╗'));
       console.log(chalk.bold.cyan('║') + chalk.bold.white('               📊 OST FILE INFORMATION') + chalk.bold.cyan('                  ║'));
       console.log(chalk.bold.cyan('╚══════════════════════════════════════════════════════════════╝'));
+      showCredits();
 
       if (!await fs.pathExists(options.input)) {
         console.error(chalk.bold.red(`❌ Error: Input file does not exist: ${options.input}`));
@@ -246,8 +356,8 @@ program
       console.log(chalk.blue('\n🔍 Analyzing file...'));
 
       // Setup progress bar for analysis
-      const progressBar = new ProgressBar(
-        chalk.cyan('📋 Analyzing: ') + chalk.white('[:bar] ') + chalk.gray('(:percent)') + chalk.magenta(' ETA: :etas'),
+      const progressBar = createProgressBar(
+        chalk.cyan('📋 Analyzing: ') + chalk.white('[:bar] ') + chalk.gray('(:percent)'),
         {
           total: 100,
           width: 40,
@@ -331,6 +441,7 @@ program
       console.log(chalk.bold.cyan('\n╔══════════════════════════════════════════════════════════════╗'));
       console.log(chalk.bold.cyan('║') + chalk.bold.white('                  📧 OST Email Extractor') + chalk.bold.cyan('                  ║'));
       console.log(chalk.bold.cyan('╚══════════════════════════════════════════════════════════════╝'));
+      showCredits();
 
       const inputPath = path.resolve(options.input);
       const outputDir = path.resolve(options.output);
@@ -365,8 +476,8 @@ program
       let mboxContent = '';
 
       // Setup progress bar
-      const progressBar = new ProgressBar(
-        chalk.cyan('📧 Extracting: ') + chalk.white('[:bar] ') + chalk.yellow(':current/:total ') + chalk.gray('(:percent)') + chalk.magenta(' ETA: :etas'),
+      const progressBar = createProgressBar(
+        chalk.cyan('📧 Extracting: ') + chalk.white('[:bar] ') + chalk.yellow(':current/:total ') + chalk.gray('(:percent)'),
         {
           total: maxEmails,
           width: 40,
@@ -655,6 +766,7 @@ program
       console.log(chalk.bold.cyan('\n╔══════════════════════════════════════════════════════════════╗'));
       console.log(chalk.bold.cyan('║') + chalk.bold.white('           🔍 PST FILE VALIDATION TOOL') + chalk.bold.cyan('              ║'));
       console.log(chalk.bold.cyan('╚══════════════════════════════════════════════════════════════╝'));
+      showCredits();
 
       const inputPath = path.resolve(options.input);
 
@@ -671,8 +783,8 @@ program
       console.log();
 
       // Setup progress bar for validation
-      const progressBar = new ProgressBar(
-        chalk.cyan('🔍 Validating: ') + chalk.white('[:bar] ') + chalk.gray('(:percent)') + chalk.magenta(' ETA: :etas'),
+      const progressBar = createProgressBar(
+        chalk.cyan('🔍 Validating: ') + chalk.white('[:bar] ') + chalk.gray('(:percent)'),
         {
           total: 100,
           width: 40,
