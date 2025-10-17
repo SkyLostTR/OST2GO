@@ -1,6 +1,6 @@
 {
   "name": "ost2go",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "A comprehensive Node.js application to convert, extract, and manage Microsoft Outlook OST files with UTF-8 support",
   "main": "src/index.js",
   "bin": {
@@ -46,6 +46,20 @@
   "devDependencies": {
     "nodemon": "^3.0.1",
     "pkg": "^5.8.1"
+  },
+  "pkg": {
+    "scripts": [
+      "src/**/*.js",
+      "bin/**/*.js"
+    ],
+    "assets": [
+      "node_modules/chalk/**/*",
+      "node_modules/commander/**/*",
+      "node_modules/fs-extra/**/*",
+      "node_modules/progress/**/*",
+      "node_modules/pst-extractor/**/*"
+    ],
+    "outputPath": "dist"
   },
   "engines": {
     "node": ">=16.0.0"

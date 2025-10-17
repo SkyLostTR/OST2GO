@@ -5,6 +5,34 @@ All notable changes to OST2GO will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2025-10-17
+
+### 🚀 Standalone Binary Release
+
+#### Added
+- **Standalone Binaries**: Pre-built executables for Windows, Linux, and macOS
+  - Windows (x64): `ost2go-win.exe` (~84 MB)
+  - Linux (x64): `ost2go-linux` (~92 MB)
+  - macOS (x64): `ost2go-macos` (~97 MB)
+- **No Node.js Required**: Binaries include complete Node.js runtime
+- **Build System**: npm scripts for building binaries
+  - `npm run build` - Build all platforms
+  - `npm run build:win` - Build Windows binary
+  - `npm run build:linux` - Build Linux binary
+  - `npm run build:mac` - Build macOS binary
+  - `npm run build:all` - Build all with default naming
+- **Build Documentation**: Comprehensive build guide in `docs/BUILD_GUIDE.md`
+- **Binary Distribution Guide**: Installation instructions in `dist/README.md`
+
+#### Changed
+- Updated `package.json` with pkg configuration and build scripts
+- Added `pkg` as development dependency
+
+#### Technical
+- Uses `pkg` (v5.8.1) to create standalone executables
+- Includes all dependencies in binaries
+- Based on Node.js v18.5.0 runtime
+
 ## [2.0.0] - 2025-01-17
 
 ### 🎉 Major Release - Complete Rewrite
