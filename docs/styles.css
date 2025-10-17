@@ -134,6 +134,22 @@ body {
     color: white;
 }
 
+.sponsor-button {
+    color: #238636 !important; /* GitHub green */
+}
+
+.sponsor-button:hover {
+    color: #2ea043 !important; /* Lighter GitHub green */
+}
+
+.coffee-button {
+    color: #ffdd00 !important; /* Buy Me a Coffee yellow */
+}
+
+.coffee-button:hover {
+    color: #ffed4a !important; /* Lighter yellow */
+}
+
 .mobile-menu-toggle {
     display: none;
     flex-direction: column;
@@ -772,6 +788,85 @@ body {
     margin-bottom: 0.5rem;
 }
 
+/* Sponsor Section */
+.sponsor-section {
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+    padding: 4rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.sponsor-content {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 3rem;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.sponsor-text h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    background: var(--gradient-1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.sponsor-text p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.sponsor-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-shrink: 0;
+}
+
+.sponsor-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s;
+    box-shadow: var(--shadow-md);
+}
+
+.github-sponsor {
+    background: linear-gradient(135deg, #238636 0%, #2ea043 100%);
+    color: white;
+}
+
+.github-sponsor:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, #2ea043 0%, #238636 100%);
+}
+
+.coffee-sponsor {
+    background: linear-gradient(135deg, #ffdd00 0%, #ffed4a 100%);
+    color: #000;
+}
+
+.coffee-sponsor:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, #ffed4a 0%, #ffdd00 100%);
+}
+
+.sponsor-btn svg {
+    flex-shrink: 0;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
     .docs-container {
@@ -801,6 +896,11 @@ body {
         grid-template-columns: 1fr 1fr;
         gap: 1.5rem;
     }
+    
+    .sponsor-content {
+        gap: 2rem;
+        padding: 0 1.5rem;
+    }
 }
 
 @media (max-width: 768px) {
@@ -822,6 +922,21 @@ body {
     
     .hero-buttons {
         flex-direction: column;
+    }
+    
+    .sponsor-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        text-align: center;
+    }
+    
+    .sponsor-buttons {
+        justify-content: center;
+    }
+    
+    .sponsor-btn {
+        padding: 0.875rem 1.25rem;
+        font-size: 0.9rem;
     }
     
     .btn {
