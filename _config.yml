@@ -1,0 +1,15 @@
+# GitHub Pages Configuration for OST2GO
+
+theme: null
+docs_dir: docs
+
+# Exclude files from the build
+exclude:
+  - node_modules/
+  - package.json
+  - package-lock.json
+  - .gitignore
+  - .github/
+  - src/
+  - test/
+  - tools/
