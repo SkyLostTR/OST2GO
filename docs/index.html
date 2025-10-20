@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-92D8WEG1WZ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-92D8WEG1WZ');
+    </script>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="OST2GO - Convert, extract, and manage Microsoft Outlook OST files with ease">
@@ -21,28 +31,31 @@
                 <span class="logo-text">OST2GO</span>
             </div>
             <ul class="nav-menu">
-                <li><a href="#home" class="nav-link active">Home</a></li>
-                <li><a href="#features" class="nav-link">Features</a></li>
-                <li><a href="#install" class="nav-link">Install</a></li>
-                <li><a href="#docs" class="nav-link">Docs</a></li>
-                <li><a href="https://github.com/SkyLostTR/OST2GO" class="nav-link" target="_blank">
+                <li><a href="#home" class="nav-link active" onclick="gtag('event', 'click', {'event_category': 'Navigation', 'event_label': 'Home'});">Home</a></li>
+                <li><a href="#features" class="nav-link" onclick="gtag('event', 'click', {'event_category': 'Navigation', 'event_label': 'Features'});">Features</a></li>
+                <li><a href="#install" class="nav-link" onclick="gtag('event', 'click', {'event_category': 'Navigation', 'event_label': 'Install'});">Install</a></li>
+                <li><a href="#docs" class="nav-link" onclick="gtag('event', 'click', {'event_category': 'Navigation', 'event_label': 'Docs'});">Docs</a></li>
+                <li><a href="https://github.com/SkyLostTR/OST2GO" class="nav-link" target="_blank" onclick="gtag('event', 'click', {'event_category': 'External Link', 'event_label': 'GitHub - Nav'});">
                     <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
                         <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
                     </svg>
                     GitHub
                 </a></li>
-                <li><a href="https://github.com/SkyLostTR/OST2GO/stargazers" class="nav-link star-button" target="_blank" title="Star this repository">
+                <li><a href="https://github.com/SkyLostTR/OST2GO/stargazers" class="nav-link star-button" target="_blank" title="Star this repository" onclick="gtag('event', 'click', {'event_category': 'GitHub', 'event_label': 'Star Button - Nav'});">
+
                     <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
                         <path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/>
                     </svg>
                     Star <span id="star-count" class="star-count">...</span>
                 </a></li>
-                <li><a href="https://github.com/sponsors/SkyLostTR" class="nav-link sponsor-button" target="_blank" title="Support via GitHub Sponsors">
+                <li><a href="https://github.com/sponsors/SkyLostTR" class="nav-link sponsor-button" target="_blank" title="Support via GitHub Sponsors" onclick="gtag('event', 'click', {'event_category': 'Sponsor', 'event_label': 'GitHub Sponsors - Nav'});">
+
                     <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
                         <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
                     </svg>
                 </a></li>
-                <li><a href="https://www.buymeacoffee.com/keeftraum" class="nav-link coffee-button" target="_blank" title="Buy me a coffee">
+                <li><a href="https://www.buymeacoffee.com/keeftraum" class="nav-link coffee-button" target="_blank" title="Buy me a coffee" onclick="gtag('event', 'click', {'event_category': 'Sponsor', 'event_label': 'Buy Me a Coffee - Nav'});">
+
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
                         <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
@@ -73,8 +86,8 @@
                     Fast, reliable, and easy to use.
                 </p>
                 <div class="hero-buttons">
-                    <a href="#install" class="btn btn-primary">Get Started</a>
-                    <a href="https://github.com/SkyLostTR/OST2GO" class="btn btn-secondary" target="_blank">View on GitHub</a>
+                    <a href="#install" class="btn btn-primary" onclick="gtag('event', 'click', {'event_category': 'CTA', 'event_label': 'Get Started'});">Get Started</a>
+                    <a href="https://github.com/SkyLostTR/OST2GO" class="btn btn-secondary" target="_blank" onclick="gtag('event', 'click', {'event_category': 'External Link', 'event_label': 'View on GitHub - Hero'});">View on GitHub</a>
                 </div>
                 <div class="hero-code">
                     <pre><code><span class="code-comment"># Install globally</span>
@@ -630,13 +643,15 @@ ost2go info -i yourfile.ost</code></pre>
                     <p>OST2GO is a free, open-source project. If you find it useful, consider supporting its development!</p>
                 </div>
                 <div class="sponsor-buttons">
-                    <a href="https://github.com/sponsors/SkyLostTR" class="sponsor-btn github-sponsor" target="_blank">
+                    <a href="https://github.com/sponsors/SkyLostTR" class="sponsor-btn github-sponsor" target="_blank" onclick="gtag('event', 'click', {'event_category': 'Sponsor', 'event_label': 'GitHub Sponsors - Section'});">
+
                         <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
                             <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
                         </svg>
                         <span>GitHub Sponsors</span>
                     </a>
-                    <a href="https://www.buymeacoffee.com/keeftraum" class="sponsor-btn coffee-sponsor" target="_blank">
+                    <a href="https://www.buymeacoffee.com/keeftraum" class="sponsor-btn coffee-sponsor" target="_blank" onclick="gtag('event', 'click', {'event_category': 'Sponsor', 'event_label': 'Buy Me a Coffee - Section'});">
+
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
                             <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
@@ -715,6 +730,26 @@ ost2go info -i yourfile.ost</code></pre>
     </footer>
 
     <script>
+        // Track copy button clicks
+        function trackCopy(command) {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'copy', {
+                    'event_category': 'Code',
+                    'event_label': command
+                });
+            }
+        }
+
+        // Track tab changes
+        function trackTabChange(tabName) {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'view', {
+                    'event_category': 'Documentation',
+                    'event_label': tabName
+                });
+            }
+        }
+
         // Fetch and display GitHub star count
         async function updateStarCount() {
             try {
@@ -728,6 +763,13 @@ ost2go info -i yourfile.ost</code></pre>
                     starCount.toString();
                 
                 document.getElementById('star-count').textContent = formattedCount;
+                
+                // Track star count as custom metric
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'github_stars', {
+                        'value': starCount
+                    });
+                }
             } catch (error) {
                 console.warn('Failed to fetch star count:', error);
                 document.getElementById('star-count').textContent = '';
@@ -747,6 +789,13 @@ ost2go info -i yourfile.ost</code></pre>
                 
                 if (versionBadge) versionBadge.textContent = `v${version}`;
                 if (versionLicense) versionLicense.textContent = version;
+                
+                // Track version as custom dimension
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'version_loaded', {
+                        'version': version
+                    });
+                }
             } catch (error) {
                 console.warn('Failed to fetch version:', error);
                 // Keep default values on error
@@ -757,6 +806,73 @@ ost2go info -i yourfile.ost</code></pre>
         document.addEventListener('DOMContentLoaded', () => {
             updateStarCount();
             updateVersion();
+            
+            // Track page sections visibility
+            const observerOptions = {
+                threshold: 0.5
+            };
+            
+            const sectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && typeof gtag !== 'undefined') {
+                        gtag('event', 'scroll', {
+                            'event_category': 'Engagement',
+                            'event_label': 'Section Viewed: ' + entry.target.id
+                        });
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe all major sections
+            document.querySelectorAll('section[id]').forEach(section => {
+                sectionObserver.observe(section);
+            });
+            
+            // Track copy button clicks
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const command = this.getAttribute('data-copy');
+                    if (command) {
+                        trackCopy(command);
+                    }
+                });
+            });
+            
+            // Track documentation tab clicks
+            document.querySelectorAll('.doc-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    if (tabName) {
+                        trackTabChange(tabName);
+                    }
+                });
+            });
+            
+            // Track mobile menu toggle
+            const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'click', {
+                            'event_category': 'Navigation',
+                            'event_label': 'Mobile Menu Toggle'
+                        });
+                    }
+                });
+            }
+            
+            // Track feature card clicks
+            document.querySelectorAll('.feature-card').forEach((card, index) => {
+                card.addEventListener('click', function() {
+                    const title = this.querySelector('.feature-title')?.textContent;
+                    if (typeof gtag !== 'undefined' && title) {
+                        gtag('event', 'click', {
+                            'event_category': 'Features',
+                            'event_label': title
+                        });
+                    }
+                });
+            });
         });
     </script>
     <script src="script.js"></script>
